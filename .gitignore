@@ -1,0 +1,14 @@
+# Variáveis de ambiente (O MAIS IMPORTANTE!)
+.env
+
+# Ficheiros compilados do Go (se fizeste go build em algum momento)
+bin/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Pastas de IDEs e Sistemas Operativos
+.vscode/
+.DS_Store

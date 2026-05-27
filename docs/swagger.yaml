@@ -1,0 +1,73 @@
+basePath: /
+definitions:
+  models.Transaction:
+    properties:
+      amount:
+        type: number
+      category:
+        type: string
+      currency:
+        type: string
+      date:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      type:
+        description: '"income" ou "expense"'
+        type: string
+      user_id:
+        description: Vamos assumir utilizador 1 por agora
+        type: integer
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API para gestão de finanças pessoais em Go.
+  title: Finances API
+  version: "1.0"
+paths:
+  /transactions:
+    post:
+      consumes:
+      - application/json
+      description: Adiciona uma receita ou despesa associada ao utilizador logado
+      parameters:
+      - description: Dados da transação
+        in: body
+        name: transaction
+        required: true
+        schema:
+          $ref: '#/definitions/models.Transaction'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Transaction'
+        "400":
+          description: JSON inválido
+          schema:
+            type: string
+        "401":
+          description: Não autorizado
+          schema:
+            type: string
+        "500":
+          description: Erro interno
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Criar uma nova transação
+      tags:
+      - transactions
+securityDefinitions:
+  BearerAuth:
+    description: Escreve 'Bearer O_TEU_TOKEN' na caixa abaixo.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
