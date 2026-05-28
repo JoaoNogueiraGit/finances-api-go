@@ -23,6 +23,8 @@ import (
 	"github.com/JoaoNogueiraGit/finances-api/internal/auth"
 	"github.com/JoaoNogueiraGit/finances-api/internal/database"
 	"github.com/JoaoNogueiraGit/finances-api/internal/handlers"
+	"github.com/JoaoNogueiraGit/finances-api/internal/middleware"
+	"github.com/JoaoNogueiraGit/finances-api/internal/openbanking"
 	"github.com/joho/godotenv"
 	httpSwagger "github.com/swaggo/http-swagger"
 )
@@ -46,10 +48,17 @@ func main() {
 		log.Fatalf("Erro critico na base de dados: %v", err)
 	}
 
+	plaidClient, err := openbanking.NewPlaidClient()
+	if err != nil {
+		log.Fatalf("Falha ao iniciar o cliente Plaid: %v", err)
+	}
+
 	defer db.Close()
 
 	txHandler := handlers.NewTransactionHandler(db)
 	userHandler := handlers.NewUserHandler(db)
+	bankingRepo := openbanking.NewRepository(db, plaidClient)
+	bankingHandler := handlers.NewOpenBankingHandler(bankingRepo)
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -74,9 +83,14 @@ func main() {
 
 	mux.HandleFunc("GET /swagger/", httpSwagger.WrapHandler)
 
+	mux.HandleFunc("POST /banking/link-token", auth.AuthMiddleware(bankingHandler.CreateLinkToken))
+	mux.HandleFunc("POST /banking/exchange-token", auth.AuthMiddleware(bankingHandler.ExchangeToken))
+	mux.HandleFunc("POST /banking/sync", auth.AuthMiddleware(bankingHandler.SyncTransactions))
+	mux.HandleFunc("GET /banking/status", auth.AuthMiddleware(bankingHandler.GetStatus))
+
 	// 4. Iniciar o Servidor
 	fmt.Printf("Servidor a correr na porta %s...\n", port)
-	log.Fatal(http.ListenAndServe(":"+port, mux))
+	log.Fatal(http.ListenAndServe(":"+port, middleware.CORS(mux)))
 }
 
 // Handler de teste para verificar se a API está viva

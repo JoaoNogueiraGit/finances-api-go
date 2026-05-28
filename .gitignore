@@ -1,7 +1,7 @@
-# Variáveis de ambiente (O MAIS IMPORTANTE!)
+# Variáveis de ambiente 
 .env
 
-# Ficheiros compilados do Go (se fizeste go build em algum momento)
+# Ficheiros compilados do Go 
 bin/
 *.exe
 *.exe~
@@ -9,6 +9,9 @@ bin/
 *.so
 *.dylib
 
-# Pastas de IDEs e Sistemas Operativos
 .vscode/
 .DS_Store
+
+# Frontend
+web/node_modules/
+web/dist/

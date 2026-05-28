@@ -87,7 +87,7 @@ func (h *TransactionHandler) GetTransactions(w http.ResponseWriter, r *http.Requ
 
 	// 1. Fazer a query à base de dados (Nota: usamos Query e não QueryRow porque esperamos vários resultados)
 	query := `
-		SELECT id, amount, currency, type, category, description, date 
+		SELECT id, amount, currency, type, category, description, date, plaid_transaction_id
 		FROM transactions 
 		WHERE user_id = $1 
 		ORDER BY date DESC
@@ -112,7 +112,7 @@ func (h *TransactionHandler) GetTransactions(w http.ResponseWriter, r *http.Requ
 		// O Scan copia os dados da linha atual para as variáveis da nossa struct
 		err := rows.Scan(
 			&tx.ID, &tx.Amount, &tx.Currency, &tx.Type,
-			&tx.Category, &tx.Description, &tx.Date,
+			&tx.Category, &tx.Description, &tx.Date, &tx.PlaidTransactionID,
 		)
 		if err != nil {
 			http.Error(w, "Erro ao processar dados", http.StatusInternalServerError)
